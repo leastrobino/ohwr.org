@@ -2406,3 +2406,11 @@ projects:
     tags:
       - 'FMC'
       - 'Documentation'
+  - id: 'rad-hard-flashing-light'
+    repository: 'https://gitlab.com/nicolas-venzin/radiation-hardened-led-flashing-light.git'
+    contact:
+      name: 'Nicolas Venzin'
+      email: 'nicolas.venzin@cern.ch'
+    tags:
+      - 'KiCad'
+      - 'Rad-tol'
