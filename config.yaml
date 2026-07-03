@@ -1931,6 +1931,7 @@ projects:
       - 'PXIe'
       - 'VME'
       - 'TRL7'
+      - 'KiCad'
     compatibles:
       - 'wr-switch-hw'
       - 'wrs-lj-hw'
@@ -2406,3 +2407,13 @@ projects:
     tags:
       - 'FMC'
       - 'Documentation'
+  - id: 'rad-hard-flashing-light'
+    repository: 'https://gitlab.com/nicolas-venzin/radiation-hardened-led-flashing-light.git'
+    contact:
+      name: 'Nicolas Venzin'
+      email: 'nicolas.venzin@cern.ch'
+    tags:
+      - 'KiCad'
+      - 'Rad-tol'
+      - 'Lighting'
+      - 'TRL8'
