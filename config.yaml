@@ -8,6 +8,7 @@ licenses: './third_party/spdx/license-list-data/json/licenses.json'
 tags:
   - '19 inch'
   - 'Amplifier'
+  - 'Analog I/O'
   - 'Attenuator'
   - 'ADC'
   - 'ARM'
@@ -2445,3 +2446,16 @@ projects:
     tags:
       - 'ASIC'
       - 'Gateware'
+  - id: 'diot-rtm-slow-analog-8i-4o'
+    repository: 'https://gitlab.cern.ch/abt-projects/public/diot-rtm-slow-analog-8i-4o.git'
+    contact:
+      name: 'Nicolas Voumard'
+      email: 'nicolas.voumard@cern.ch'
+    compatibles:
+      - 'diot-crate-hw'
+      - 'diot-pfc-ku'
+      - 'diot-pb-dummy'
+    tags:
+      - 'DI/OT'
+      - 'Analog I/O'
+      - 'TRL7'
