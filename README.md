@@ -32,7 +32,7 @@ theme.
 
 * [Go](https://go.dev/doc/install) >= 1.23.10
 * [Hugo](https://gohugo.io/installation) (the extended edition) >= 0.147.2
-* [Python](https://www.python.org/downloads) >= 3.12.3
+* [Python](https://www.python.org/downloads) >= 3.12.13
 * [PyYAML](https://pyyaml.org/wiki/PyYAMLDocumentation) >= 6.0.2
 * [Pydantic](https://docs.pydantic.dev/latest/install) >= 2.11.7
 * [email-validator](https://github.com/JoshData/python-email-validator?tab=readme-ov-file#installation)

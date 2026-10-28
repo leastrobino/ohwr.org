@@ -19,7 +19,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v7
         with:
-          python-version: '3.12.3'
+          python-version: '3.12.13'
       - name: Install dependencies
         run: |
           pip install pydantic PyYAML email_validator requests pytest \
