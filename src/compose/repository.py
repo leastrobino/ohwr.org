@@ -4,7 +4,6 @@
 
 """Represent Git Repositories."""
 
-import json
 import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -111,15 +110,9 @@ class GitLabRepository(Repository):
             r'^https://((?:gitlab\.com|gitlab\.cern\.ch))/(.+?)\.git',
             self.url,
         )
-        url = 'https://{0}/api/v4/projects/{1}'.format(
+        url = 'https://{}/api/v4/projects/{}/repository/files/{}/raw'.format(
             match.group(1),
             quote(match.group(2), safe=''),
-        )
-        try:
-            default_branch = self._get(url).json()['default_branch']
-        except (TypeError, json.JSONDecodeError, KeyError) as json_error:
-            raise ValueError('Failed to load JSON:\n{0}'.format(json_error))
-        url = 'https://{0}/{1}/-/raw/{2}/{3}'.format(
-            match.group(1), match.group(2), default_branch, path,
+            quote(path, safe=''),
         )
         return self._get(url).text

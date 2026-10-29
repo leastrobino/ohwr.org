@@ -6,17 +6,29 @@
 
 from functools import partial
 import json
+import os
 import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-import time
-from typing import Annotated, Any
+from typing import Annotated, Any, Optional
 from urllib.parse import quote, urljoin
 import warnings
 
 import requests
 from pydantic import Field, GetCoreSchemaHandler
 from pydantic_core import CoreSchema, core_schema
+
+
+retries = requests.urllib3.util.Retry(
+    total=3,
+    status_forcelist=[429, 500, 502, 503, 504],
+    backoff_factor=0.5,
+    retry_after_max=10,
+)
+session = requests.Session()
+adapter = requests.adapters.HTTPAdapter(max_retries=retries)
+session.mount('http://', adapter)
+session.mount('https://', adapter)
 
 
 @dataclass
@@ -73,48 +85,46 @@ class Url:
         return url.url
 
     @classmethod
-    def _head(cls, url: str, max_retries: int = 3) -> requests.Response:
-        requests_error = None
-        for attempt in range(max_retries):
-            if attempt > 0:
-                time.sleep(attempt)
+    def _get_auth_headers(cls, url: str) -> dict:
+        if url.startswith('https://gitlab.com/'):
+            return {'PRIVATE-TOKEN': os.environ.get('GITLAB_TOKEN')}
+        if url.startswith('https://gitlab.cern.ch/'):
+            return {'PRIVATE-TOKEN': os.environ.get('GITLAB_CERN_TOKEN')}
+        return {}
+
+    @classmethod
+    def _request(
+        cls, method: str, url: str, headers: Optional[dict] = None,
+    ) -> requests.Response:
+        headers = cls._get_auth_headers(url) | (headers or {})
+        error = None
+        while True:
             try:
-                res = requests.head(url, timeout=10, allow_redirects=True)
-            except requests.exceptions.RequestException as head_error:
-                requests_error = head_error
-                continue
+                res = session.request(method, url, headers=headers, timeout=10)
+            except requests.exceptions.RequestException as request_error:
+                error = request_error
+                break
             try:
                 res.raise_for_status()
             except requests.exceptions.RequestException as status_error:
-                requests_error = status_error
-                continue
+                error = status_error
+                break
             return res
-        raise ValueError("HEAD request to '{0}' failed:\n{1}".format(
-            url, requests_error,
+        raise ValueError("{0} request to '{1}' failed:\n{2}".format(
+            method, url, error,
         ))
 
     @classmethod
-    def _get(
-        cls, url: str, headers: str = '', max_retries: int = 3,
+    def _head(
+        cls, url: str, headers: Optional[dict] = None,
     ) -> requests.Response:
-        requests_error = None
-        for attempt in range(max_retries):
-            if attempt > 0:
-                time.sleep(attempt)
-            try:
-                res = requests.get(url, headers=headers, timeout=10)
-            except requests.exceptions.RequestException as get_error:
-                requests_error = get_error
-                continue
-            try:
-                res.raise_for_status()
-            except requests.exceptions.RequestException as status_error:
-                requests_error = status_error
-                continue
-            return res
-        raise ValueError("GET request to '{0}' failed:\n{1}".format(
-            url, requests_error,
-        ))
+        return cls._request('HEAD', url, headers=headers)
+
+    @classmethod
+    def _get(
+        cls, url: str, headers: Optional[dict] = None,
+    ) -> requests.Response:
+        return cls._request('GET', url, headers=headers)
 
 
 UrlList = Annotated[list[Url], Field(min_length=1)]
